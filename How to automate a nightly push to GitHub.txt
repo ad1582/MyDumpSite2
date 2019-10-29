@@ -1,0 +1,154 @@
+How to automate a nightly push to a GitHub branch from a live website with powershell and a batch file
+
+I have a live website (served via IIS on a Windows Server 2008 R2) and a github repo on that server as well. I work in a small development team (3 people) and we want to every night, automatically have our live website:
+
+    Copy from the IIS hosted folder to our local repo (on the same server)
+    Checkout the "NightlyPush" branch
+    Add all files in the freshly updated repo (so it matches Prod at this point)
+    Commit all the files in the repo
+    Do a (forced) push to update GitHub.
+
+This way we have a master branch which is only touched by developers manually, however the "NightlyPush" branch will have the most recent version of our site from the night before. This way we can be sure master will always be stable, but NightlyPush is a nice backup that we can always use if we ever run into trouble or need to look at past code.
+
+I wrote a script in Powershell which handles all this and it works well when I run it manually from the Git Shell(posh-git) prompt, however automating it via a batch file isn't working. If I run my script from PowerShell (non-Git one) it doesn't recognize any Git commands... so I figured I could run it via the Git Shell with the same syntax:
+
+C:\Users\Me\AppData\Local\GitHub\GitHub.appref-ms --open-shell -no-exit C:\Users\Me\Documents\Scripts\CopySite_And_PushToGitHub.ps1
+
+This opens Git Shell, however it just sits there flashing, as if I didn't pass it a script to execute. If I manually paste the path into the prompt and hit enter -- everything works.
+
+**Note: This is my first foray into GitHub, Powershell, and batch files, I could be missing something stupid/obvious. If that's the case, I will accept the shaming as long as someone can help me figure this out!
+git batch-file powershell scheduled-tasks posh-git
+shareimprove this question
+asked Jul 29 '14 at 19:48
+webDevAndEverythingElse
+37944 silver badges1818 bronze badges
+
+    1
+    Add PoSH Git to your default powershell profile (and when scheduling it as a task, check the task's user profile as well). This article should get you started. – Roderick Bant Aug 28 '14 at 18:16
+    This sounds suspiciously like the git commands are not in your Path. If you create a Powershell script that writes the output of $env:Path.Split(';') | select-string -pattern [Gg]it to a file, what is the result? – Adam Glauser Oct 8 '14 at 15:31 
+
+add a comment
+1 Answer
+active
+oldest
+votes
+0
+
+    Add PoSH Git to your default powershell profile (and when scheduling it as a task, check the task's user profile as well). This article should get you started. - Roderick Bant
+
+shareimprove this answer
+edited May 23 '17 at 12:12
+Community?
+111 silver badge
+answered Nov 10 '14 at 14:35
+webDevAndEverythingElse
+37944 silver badges1818 bronze badges
+add a comment
+Your Answer
+
+Sign up or log in
+Sign up using Google
+Sign up using Facebook
+Sign up using Email and Password
+Post as a guest
+Name
+Email
+
+Required, but never shown
+
+By clicking “Post Your Answer”, you agree to our terms of service, privacy policy and cookie policy
+Not the answer you're looking for? Browse other questions tagged git batch-file powershell scheduled-tasks posh-git or ask your own question.
+Blog
+
+    How Stack Overflow for Teams Brought This Company’s Leadership and…
+
+    The puzzle masters behind Facebook’s Hacker Cup explain how they craft questions
+
+Featured on Meta
+
+    Feedback post: Moderator review and reinstatement processes
+
+    Post for clarifications on the updated pronouns FAQ
+
+    Threshold experiment results: closing, editing and reopening all become more…
+
+    Feedback and suggestions for editable section of Help Center
+
+Linked
+23
+How to use posh-git that comes with GitHub for Windows from custom shell?
+Related
+1086
+How can I pass arguments to a batch file?
+6504
+How to remove local (untracked) files from the current Git working tree
+1356
+How to selectively merge or pick changes from another branch in Git?
+1752
+How can I delete a file from a Git repository?
+1123
+How to get just one file from another branch
+4123
+How do I push a new local branch to a remote Git repository and track it too?
+1530
+How to replace master branch in Git, entirely, from another branch?
+1398
+How to compare files from two different branches?
+117
+Pushing a local branch up to GitHub
+793
+How to revert a merge commit that's already pushed to remote branch?
+Hot Network Questions
+
+    Approx 1948 Brasil Brazil Airliner...what is it? Taildragger?
+    Ethan Finds the Maximum Element
+    You are too/ very kind to me
+    Why didn't Hogwarts shut down after these type of events?
+    Does sleeping fewer hours than needed cause common cold?
+    Was a supercomputer really needed in "The Martian"?
+    How to block an IP address?
+
+more hot questions
+Question feed
+
+Stack Overflow
+
+    Questions
+    Jobs
+    Developer Jobs Directory
+    Salary Calculator
+    Help
+    Mobile
+    Disable Responsiveness
+
+Products
+
+    Teams
+    Talent
+    Advertising
+    Enterprise
+
+Company
+
+    About
+    Press
+    Work Here
+    Legal
+    Privacy Policy
+    Contact Us
+
+Stack Exchange
+Network
+
+    Technology
+    Life / Arts
+    Culture / Recreation
+    Science
+    Other
+
+    Blog
+    Facebook
+    Twitter
+    LinkedIn
+
+site design / logo © 2019 Stack Exchange Inc; user contributions licensed under cc by-sa 4.0 with attribution required. rev 2019.10.26.35258

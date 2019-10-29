@@ -1,0 +1,90 @@
+Automatic Git polling on windows
+
+When you need to continuously poll for a repository without using a system like Jenkins, the most simple batch commands can be used with the windows scheduler.
+
+Install GIT
+http://git-scm.com/downloads
+
+I will be placing the downloads in the directory
+C:\projects
+
+Open CMD and move to directory
+C:\projects\wogl
+
+I created a file called clone.bat
+-------------------------------------------------------------------------------------------------------------------------------
+C:\Git\bin\git.exe clone ssh://john@project.vislab.usyd.edu.au/Groups/WOGL/wogl.git
+-------------------------------------------------------------------------------------------------------------------------------
+
+if ssh is setup correctly, then the project will appear. See ssh guide in https://sites.google.com/a/vislab.net/vislab-home/resources/jenkins-continuous-integration.
+
+I created another file called expected_for_no_changes.txt
+-------------------------------------------------------------------------------------------------------------------------------
+Already up-to-date.
+-------------------------------------------------------------------------------------------------------------------------------
+
+I created another file called poll_scm.bat
+-------------------------------------------------------------------------------------------------------------------------------
+C:\Git\bin\date.exe >> C:\projects\wogl\log.txt
+
+cd C:\projects\wogl\wogl
+C:\Git\bin\git.exe reset --hard
+C:\Git\bin\git.exe pull > C:\projects\wogl\last_pull.txt
+
+C:\Git\bin\diff.exe C:\projects\wogl\last_pull.txt C:\projects\wogl\expected_for_no_changes.txt > C:\projects\wogl\changes.txt
+
+timeout 2
+-------------------------------------------------------------------------------------------------------------------------------
+
+1) This batch file logs the date of the last pull (to be checked later).
+2) The project is pulled and the resulting text is placed in a file called last_pull.txt
+3) A diff is done between the output of the git pull result and the expected_for_no_changes.txt
+
+ - If there are no changes the file C:\projects\wogl\changes.txt will be empty
+
+
+Setup the windows schedule task to run at a given interval.
+
+
+
+
+
+
+So that should poll fine for the interval set.
+
+
+To integrate with the automated testing, you can also create a script that checks if there were any changes.
+
+I created another file called launch_tests.bat
+-------------------------------------------------------------------------------------------------------------------------------
+REM get the length of changes.txt
+for %%a in (changes.txt) do (
+set length=%%~za
+)
+echo lenght is  %length%
+
+REM if empty, quit
+if %length% == 0 (
+    echo nope!!!
+    timeout 12
+    exit
+)
+
+REM run tests from here
+
+echo gonna do stuff now...
+
+REM don't allow changes to run again
+del changes.txt
+C:\Git\bin\touch.exe changes.txt
+
+timeout 25
+-------------------------------------------------------------------------------------------------------------------------------
+
+Note that in windows, doing things is a little bit ugly.
+
+
+Comments
+You do not have permission to add comments.
+
+Sign in|Report Abuse|Powered By Google Sites
